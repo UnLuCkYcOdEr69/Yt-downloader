@@ -101,8 +101,6 @@ def download_audio(url, task_id, progress_store):
     progress_store[task_id] = {"status": "starting", "percent": 1}
 
     ydl_opts = {
-        if cookies_file:
-    ydl_opts["cookiefile"] = cookies_file
         "format": "bestaudio/best",
         "outtmpl": outtmpl,
         "noplaylist": True,
@@ -115,6 +113,8 @@ def download_audio(url, task_id, progress_store):
         }],
         
     }
+    if cookies_file:
+        ydl_opts["cookiefile"] = cookies_file
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
