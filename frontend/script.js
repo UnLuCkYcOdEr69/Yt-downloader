@@ -1,4 +1,4 @@
-const API = "http://127.0.0.1:5000";
+const API = "https://yt-downloader-p7s2.onrender.com";
 
 const fetchBtn = document.getElementById("fetchBtn");
 const statusEl = document.getElementById("status");
