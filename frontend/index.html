@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Downloader</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body>
+  <div class="bg-blur"></div>
+
+  <main class="app">
+    <header class="top">
+      <div class="logo yt-logo">
+        <svg width="26" height="18" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M27.4 3.1C27.1 2 26.3 1.2 25.2 0.9C23.2 0.3 14 0.3 14 0.3C14 0.3 4.8 0.3 2.8 0.9C1.7 1.2 0.9 2 0.6 3.1C0 5.1 0 10 0 10C0 10 0 14.9 0.6 16.9C0.9 18 1.7 18.8 2.8 19.1C4.8 19.7 14 19.7 14 19.7C14 19.7 23.2 19.7 25.2 19.1C26.3 18.8 27.1 18 27.4 16.9C28 14.9 28 10 28 10C28 10 28 5.1 27.4 3.1Z" fill="#FF0033"/>
+          <path d="M11.2 14.4V5.6L18.6 10L11.2 14.4Z" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">
+          <span class="yt">YouTube</span>
+          <span class="dl">Downloader</span>
+        </h1>
+
+        <p class="tagline">Fast. Clean. Highest quality MP4 + MP3.</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="input-row">
+        <input id="url" type="text" placeholder="Paste YouTube link here..." autocomplete="off" />
+        <button id="fetchBtn" class="btn primary" onclick="fetchInfo()">
+          <span class="btn-text">Fetch</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <p id="status" class="status"></p>
+
+      <!-- Video Info -->
+      <div id="info" class="info hidden">
+        <div class="thumb-wrap">
+          <img id="thumb" src="" alt="Thumbnail" />
+        </div>
+
+        <div class="meta">
+          <h2 id="title">Video Title</h2>
+          <div class="badges">
+            <span class="badge">4k</span>
+            <span class="badge">MP4+Audio</span>
+            <span class="badge">MP3 320</span>
+          </div>
+
+          <!-- Download Buttons appear after fetch -->
+          <div id="actions" class="actions hidden">
+            <button class="btn video" onclick="downloadFile('mp4')">
+              🎥 Download MP4
+            </button>
+            <button class="btn audio" onclick="downloadFile('mp3')">
+              🎧 Download MP3
+            </button>
+          </div>
+
+          <!-- Progress -->
+          <div id="progressBox" class="progress-box hidden">
+            <div class="progress-top">
+              <span id="progressText">Preparing...</span>
+              <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div id="progressFill" class="progress-fill"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>⚡ Built by AD 💖</span>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+<!--python -m http.server 5500 --bind 127.0.0.1 (use in terminal to run)>

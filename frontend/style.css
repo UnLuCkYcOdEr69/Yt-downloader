@@ -1,0 +1,404 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+}
+
+:root{
+  /* theme */
+  --bgBase: #0b1020;                /* slightly lighter dark */
+  --glass: rgba(255,255,255,0.10);  /* brighter glass */
+  --glassBorder: rgba(255,255,255,0.16);
+
+  --text: #f4f6ff;
+  --muted: rgba(244,246,255,0.78);
+  --muted2: rgba(244,246,255,0.60);
+
+  /* accents */
+  --accent1: #7c3aed; /* violet */
+  --accent2: #06b6d4; /* cyan */
+  --accent3: #22c55e; /* green */
+  --accent4: #fb7185; /* rose */
+
+  --shadow: rgba(0,0,0,0.42);
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 22px;
+  background: var(--bgBase);
+  overflow: hidden;
+}
+
+/* ✅ vibrant, dynamic but not gloomy */
+body::before{
+  content:"";
+  position: fixed;
+  inset: -30%;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(124,58,237,0.40), transparent 46%),
+    radial-gradient(circle at 85% 18%, rgba(6,182,212,0.36), transparent 50%),
+    radial-gradient(circle at 55% 90%, rgba(34,197,94,0.22), transparent 58%),
+    radial-gradient(circle at 65% 55%, rgba(251,113,133,0.16), transparent 62%);
+  filter: blur(70px);
+  opacity: 1;
+  animation: floatBg 12s ease-in-out infinite alternate;
+  transform: translate3d(0,0,0);
+  pointer-events: none;
+  z-index: -2;
+}
+
+/* soft bright vignette */
+body::after{
+  content:"";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,0.10), transparent 60%),
+    linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(0,0,0,0.45));
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* grain texture */
+.bg-blur{
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: 0.28;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes floatBg{
+  0%{ transform: translate(-1.6%, -1.6%) scale(1.05); }
+  100%{ transform: translate(1.6%, 1.6%) scale(1.12); }
+}
+
+.app {
+  width: min(900px, 95vw);
+  display: grid;
+  gap: 18px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.yt-logo svg{
+  display: block;
+  filter: drop-shadow(0 10px 18px rgba(255, 0, 51, 0.25));
+}
+
+
+/* ✅ nicer title look */
+/* ✅ Modern minimal heading font */
+.brand-title{
+  font-family: "Poppins", "Segoendow", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  line-height: 1.1;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+/* ✅ Light red YouTube */
+.brand-title .yt{
+  color: #ff5a6a; /* light red */
+  text-shadow: 0 10px 30px rgba(255, 90, 106, 0.18);
+}
+
+/* ✅ White Downloader */
+.brand-title .dl{
+  color: #ffffff;
+  opacity: 0.92;
+}
+
+
+.tagline {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ✅ cleaner glass card */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--glassBorder);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 26px 90px var(--shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+input {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  outline: none;
+  font-size: 14px;
+}
+
+input::placeholder{
+  color: rgba(244,246,255,0.62);
+}
+
+input:focus {
+  border-color: rgba(6, 182, 212, 0.75);
+  box-shadow: 0 0 0 3px rgba(6,182,212,0.18);
+}
+
+/* buttons */
+.btn {
+  border: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-weight: 750;
+  transition: transform 0.08s ease, opacity 0.2s ease, filter 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn:active { transform: scale(0.98); }
+
+/* ✅ PRIMARY BUTTON WITH EDGE LOADER */
+.btn.primary {
+  min-width: 126px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+
+/* rotating glow ring */
+.btn.primary::before{
+  content:"";
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.85) 12%,
+    rgba(6,182,212,0.95) 24%,
+    rgba(124,58,237,0.95) 38%,
+    rgba(251,113,133,0.85) 52%,
+    rgba(255,255,255,0) 70%,
+    rgba(255,255,255,0) 100%
+  );
+  opacity: 0;
+  filter: blur(0.55px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* inner gradient */
+/* inner background (YouTube Red) */
+.btn.primary::after{
+  content:"";
+  position: absolute;
+  inset: 2px;
+  border-radius: 14px;
+
+  /* ✅ YouTube Red background */
+  background: linear-gradient(135deg, #d81a40, #d81a40);
+
+  /* ✅ subtle depth */
+  box-shadow: 0 14px 50px rgba(255, 0, 51, 0.18);
+
+  z-index: 1;
+}
+
+
+.btn.primary .btn-text{
+  position: relative;
+  z-index: 2;
+  font-size: 17px;   /* ✅ increased */
+  font-weight: 800;
+}
+
+
+/* hide spinner element */
+.spinner{
+  display: none !important;
+}
+
+/* loading effect */
+.loading.btn.primary::before{
+  opacity: 1;
+  animation: edgeRun 1.05s linear infinite;
+  box-shadow:
+    0 0 16px rgba(6,182,212,0.22),
+    0 0 28px rgba(124,58,237,0.18);
+}
+
+@keyframes edgeRun{
+  to { transform: rotate(360deg); }
+}
+
+.btn.primary:hover{
+  filter: brightness(1.07) saturate(1.15);
+}
+
+
+/* MP4 / MP3 buttons */
+.btn.video,
+.btn.audio {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.14),
+    rgba(251, 113, 133, 0.12),
+    rgba(255, 255, 255, 0.05)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: white;
+}
+
+.btn.video:hover,
+.btn.audio:hover {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.16),
+    rgba(251, 113, 133, 0.14),
+    rgba(255, 255, 255, 0.06)
+  );
+  filter: brightness(1.06);
+  box-shadow:
+    0 0 14px rgba(251, 113, 133, 0.16),
+    0 0 22px rgba(255, 255, 255, 0.07);
+}
+
+
+.status {
+  margin-top: 10px;
+  color: rgba(244, 246, 255, 0.78);
+  font-size: 13px;
+  min-height: 18px;
+}
+
+.info {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.thumb-wrap {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+}
+
+.thumb-wrap img {
+  width: 100%;
+  display: block;
+}
+
+.meta h2 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.progress-box {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.progress-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: rgba(244, 246, 255, 0.8);
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  transition: width 0.25s ease;
+}
+
+.footer {
+  text-align: center;
+  color: var(--muted2);
+  font-size: 12px;
+}
+
+/* utility */
+.hidden { display: none; }
+
+/* mobile */
+@media (max-width: 760px) {
+  .info { grid-template-columns: 1fr; }
+  .input-row { grid-template-columns: 1fr; }
+  .btn.primary { width: 100%; }
+}
