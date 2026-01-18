@@ -86,14 +86,11 @@ def progress(task_id):
 def serve_download(filename):
     file_path = os.path.join(DOWNLOAD_DIR, filename)
 
-    # ✅ Prevent empty/invalid downloads
-    if not os.path.exists(file_path):
-        return jsonify({"error": "File not found yet"}), 404
-
-    if os.path.getsize(file_path) == 0:
-        return jsonify({"error": "File is still being generated. Try again in a moment."}), 400
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+        return jsonify({"error": "File not ready or empty"}), 404
 
     return send_file(file_path, as_attachment=True)
+
 
 
 if __name__ == "__main__":
