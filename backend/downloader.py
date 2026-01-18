@@ -7,15 +7,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-# ✅ Render Secret File cookie path (mounted here)
 COOKIES_FILE = os.path.join(BASE_DIR, "cookies.txt")
 
 
 def _get_cookiefile_if_exists():
-    """
-    Uses Render secret file cookies.txt if it exists.
-    Returns path or None.
-    """
     if os.path.exists(COOKIES_FILE) and os.path.getsize(COOKIES_FILE) > 0:
         return COOKIES_FILE
     return None
@@ -29,7 +24,6 @@ def get_video_info(url):
         "noplaylist": True,
     }
 
-    # ✅ attach cookies if available
     if cookiefile:
         ydl_opts["cookiefile"] = cookiefile
 
@@ -62,13 +56,35 @@ def _build_progress_hook(progress_store, task_id):
             }
 
         elif status == "finished":
-            # yt-dlp finished downloading streams, merging may start
+            # download finished, merging/postprocessing can still happen
             progress_store[task_id] = {
                 "status": "processing",
                 "percent": 99
             }
 
     return hook
+
+
+def _wait_for_file_ready(filepath, timeout_sec=60):
+    """
+    Wait until file exists and size becomes > 0 and stable.
+    Prevents 'empty file' downloads on Render.
+    """
+    timeout = time.time() + timeout_sec
+    last_size = -1
+
+    while time.time() < timeout:
+        if os.path.exists(filepath):
+            size = os.path.getsize(filepath)
+            # Must be non-zero
+            if size > 0:
+                # Ensure it's stable (not still being written)
+                if size == last_size:
+                    return True
+                last_size = size
+        time.sleep(0.3)
+
+    return False
 
 
 # 🎥 MP4 — VIDEO + AUDIO merged
@@ -90,7 +106,6 @@ def download_video(url, task_id, progress_store):
         "progress_hooks": [_build_progress_hook(progress_store, task_id)],
     }
 
-    # ✅ attach cookies if available
     if cookiefile:
         ydl_opts["cookiefile"] = cookiefile
 
@@ -99,14 +114,20 @@ def download_video(url, task_id, progress_store):
 
     final_file = os.path.join(DOWNLOAD_DIR, f"{uid}.mp4")
 
-    timeout = time.time() + 30
-    while not os.path.exists(final_file):
-        if time.time() > timeout:
-            progress_store[task_id] = {"status": "error", "percent": 0, "error": "Final MP4 not created"}
-            raise RuntimeError("Final MP4 not created")
-        time.sleep(0.2)
+    ready = _wait_for_file_ready(final_file, timeout_sec=90)
+    if not ready:
+        progress_store[task_id] = {
+            "status": "error",
+            "percent": 0,
+            "error": "Final MP4 not created or empty"
+        }
+        raise RuntimeError("Final MP4 not created or empty")
 
-    progress_store[task_id] = {"status": "done", "percent": 100, "file": f"{uid}.mp4"}
+    progress_store[task_id] = {
+        "status": "done",
+        "percent": 100,
+        "file": f"{uid}.mp4"
+    }
     return f"{uid}.mp4"
 
 
@@ -132,7 +153,6 @@ def download_audio(url, task_id, progress_store):
         }],
     }
 
-    # ✅ attach cookies if available
     if cookiefile:
         ydl_opts["cookiefile"] = cookiefile
 
@@ -141,12 +161,18 @@ def download_audio(url, task_id, progress_store):
 
     final_file = os.path.join(DOWNLOAD_DIR, f"{uid}.mp3")
 
-    timeout = time.time() + 30
-    while not os.path.exists(final_file):
-        if time.time() > timeout:
-            progress_store[task_id] = {"status": "error", "percent": 0, "error": "Final MP3 not created"}
-            raise RuntimeError("Final MP3 not created")
-        time.sleep(0.2)
+    ready = _wait_for_file_ready(final_file, timeout_sec=90)
+    if not ready:
+        progress_store[task_id] = {
+            "status": "error",
+            "percent": 0,
+            "error": "Final MP3 not created or empty"
+        }
+        raise RuntimeError("Final MP3 not created or empty")
 
-    progress_store[task_id] = {"status": "done", "percent": 100, "file": f"{uid}.mp3"}
+    progress_store[task_id] = {
+        "status": "done",
+        "percent": 100,
+        "file": f"{uid}.mp3"
+    }
     return f"{uid}.mp3"
