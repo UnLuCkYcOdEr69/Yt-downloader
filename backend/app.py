@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 import threading
 import uuid
+import time
 
 from downloader import get_video_info, download_video, download_audio
 
@@ -81,16 +82,23 @@ def progress(task_id):
     return jsonify(PROGRESS.get(task_id, {"status": "unknown", "percent": 0}))
 
 
-# ✅ Download final file to user's PC
+# ✅ Download final file to user's PC (Render safe)
 @app.route("/download/<filename>", methods=["GET"])
 def serve_download(filename):
     file_path = os.path.join(DOWNLOAD_DIR, filename)
 
-    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
-        return jsonify({"error": "File not ready or empty"}), 404
+    # ✅ Wait until file exists and has data (prevents empty 0 byte download)
+    timeout = time.time() + 40  # wait max 40 sec
+    while True:
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 1024:  # >1KB = valid
+            break
+
+        if time.time() > timeout:
+            return jsonify({"error": "File not ready or empty, try again"}), 404
+
+        time.sleep(0.3)
 
     return send_file(file_path, as_attachment=True)
-
 
 
 if __name__ == "__main__":
