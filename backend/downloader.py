@@ -3,24 +3,37 @@ import os
 import uuid
 import time
 
-COOKIES_PATH = os.path.join(os.path.dirname(__file__), "cookies.txt")
-
-def ensure_cookies_file():
-    cookies_data = os.getenv("YT_COOKIES", "").strip()
-    if cookies_data:
-        with open(COOKIES_PATH, "w", encoding="utf-8") as f:
-            f.write(cookies_data)
-        return COOKIES_PATH
-    return None
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
+# ✅ Render Secret File cookie path (mounted here)
+COOKIES_FILE = os.path.join(BASE_DIR, "cookies.txt")
+
+
+def _get_cookiefile_if_exists():
+    """
+    Uses Render secret file cookies.txt if it exists.
+    Returns path or None.
+    """
+    if os.path.exists(COOKIES_FILE) and os.path.getsize(COOKIES_FILE) > 0:
+        return COOKIES_FILE
+    return None
+
 
 def get_video_info(url):
-    cookies_file = ensure_cookies_file()
-    with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+    cookiefile = _get_cookiefile_if_exists()
+
+    ydl_opts = {
+        "quiet": True,
+        "noplaylist": True,
+    }
+
+    # ✅ attach cookies if available
+    if cookiefile:
+        ydl_opts["cookiefile"] = cookiefile
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
 
     return {
@@ -60,11 +73,12 @@ def _build_progress_hook(progress_store, task_id):
 
 # 🎥 MP4 — VIDEO + AUDIO merged
 def download_video(url, task_id, progress_store):
-    cookies_file = ensure_cookies_file()
     uid = str(uuid.uuid4())
     outtmpl = os.path.join(DOWNLOAD_DIR, f"{uid}.%(ext)s")
 
     progress_store[task_id] = {"status": "starting", "percent": 1}
+
+    cookiefile = _get_cookiefile_if_exists()
 
     ydl_opts = {
         "format": "bv*[ext=mp4][vcodec^=avc1]+ba[ext=m4a]/bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]",
@@ -75,6 +89,10 @@ def download_video(url, task_id, progress_store):
         "quiet": True,
         "progress_hooks": [_build_progress_hook(progress_store, task_id)],
     }
+
+    # ✅ attach cookies if available
+    if cookiefile:
+        ydl_opts["cookiefile"] = cookiefile
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -94,11 +112,12 @@ def download_video(url, task_id, progress_store):
 
 # 🎧 MP3 — AUDIO only
 def download_audio(url, task_id, progress_store):
-    cookies_file = ensure_cookies_file()
     uid = str(uuid.uuid4())
     outtmpl = os.path.join(DOWNLOAD_DIR, f"{uid}.%(ext)s")
 
     progress_store[task_id] = {"status": "starting", "percent": 1}
+
+    cookiefile = _get_cookiefile_if_exists()
 
     ydl_opts = {
         "format": "bestaudio/best",
@@ -111,10 +130,11 @@ def download_audio(url, task_id, progress_store):
             "preferredcodec": "mp3",
             "preferredquality": "320",
         }],
-        
     }
-    if cookies_file:
-        ydl_opts["cookiefile"] = cookies_file
+
+    # ✅ attach cookies if available
+    if cookiefile:
+        ydl_opts["cookiefile"] = cookiefile
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
