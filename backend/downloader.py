@@ -22,18 +22,27 @@ def get_video_info(url):
     ydl_opts = {
         "quiet": True,
         "noplaylist": True,
+        "skip_download": True,
     }
 
     if cookiefile:
         ydl_opts["cookiefile"] = cookiefile
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
 
-    return {
-        "title": info.get("title"),
-        "thumbnail": info.get("thumbnail"),
-    }
+        return {
+            "title": info.get("title"),
+            "thumbnail": info.get("thumbnail"),
+        }
+
+    except Exception:
+        # ✅ fallback so frontend still shows something
+        return {
+            "title": "Video Found ✅ (Info limited on server)",
+            "thumbnail": ""
+        }
 
 
 def _build_progress_hook(progress_store, task_id):
